@@ -4,8 +4,9 @@
 
 
 ### Install :
+```git
 composer require sinxalex/datepicker
-
+```
 
 ### Example use :
 ```php
