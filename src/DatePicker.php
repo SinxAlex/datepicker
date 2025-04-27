@@ -49,7 +49,7 @@ class DatePicker extends \yii\widgets\InputWidget
 
         if ($this->format === null) {
             $this->format = 'd.m.Y';
-        }йй
+        }
 
         if (!isset($this->options['id'])) {
             $this->options['id'] = $this->getId();
@@ -78,6 +78,7 @@ class DatePicker extends \yii\widgets\InputWidget
         // Убедитесь, что значение правильно форматируется
         if ($this->hasModel() && $this->model->{$this->attribute}) {
             $this->value = Yii::$app->formatter->asDate($this->model->{$this->attribute}, $this->format);
+            $this->options['value'] = $this->value; // Явно устанавливаем значение
         }
 
         $input = $this->hasModel()
@@ -95,35 +96,38 @@ class DatePicker extends \yii\widgets\InputWidget
 
         $id = $this->options['id'];
         $options = $this->getClientOptions();
-        $phpFormat = $this->format;
-        $jsFormat = $this->getJsDateFormat();
 
         $js = <<<JS
-            (function() {
-                const tempusDominus = window.tempusDominus;
-                const input = document.getElementById('$id');
-                
-                // Инициализация пикера
-                const picker = new tempusDominus.TempusDominus(input, $options);
-                
-                // Обработка изменения даты
-                picker.subscribe(tempusDominus.Namespace.events.change, (event) => {
-                    if (event.date) {
-                        const formattedDate = picker.dates.formatInput(event.date);
-                        input.value = formattedDate;
-                        // Триггерим событие change для обновления модели Yii
-                        const changeEvent = new Event('change', { bubbles: true });
-                        input.dispatchEvent(changeEvent);
-                    }
-                });
-                
-                // Инициализация текущего значения, если оно есть
-                if (input.value) {
-                    picker.dates.set(tempusDominus.DateTime.convert(input.value));
+        (function() {
+            const tempusDominus = window.tempusDominus;
+            const input = document.getElementById('$id');
+            
+            // Инициализация пикера
+            const picker = new tempusDominus.TempusDominus(input, $options);
+            
+            // Обработка изменения даты
+            picker.subscribe(tempusDominus.Namespace.events.change, (event) => {
+                if (event.date) {
+                    const formattedDate = picker.dates.formatInput(event.date);
+                    input.value = formattedDate;
+                    // Явно обновляем атрибут value
+                    input.setAttribute('value', formattedDate);
+                    // Триггерим событие change для обновления модели Yii
+                    const changeEvent = new Event('change', { bubbles: true });
+                    input.dispatchEvent(changeEvent);
                 }
-            })();
-            JS;
+            });
+            
+            // Инициализация текущего значения, если оно есть
+            if (input.value) {
+                picker.dates.set(tempusDominus.DateTime.convert(input.value));
+                // Явно обновляем атрибут value при инициализации
+                input.setAttribute('value', input.value);
+            }
+        })();
+        JS;
 
+        $view->registerJs($js);
         $view->registerJs($js);
     }
 
