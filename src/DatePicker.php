@@ -102,10 +102,10 @@ class DatePicker extends \yii\widgets\InputWidget
             const tempusDominus = window.tempusDominus;
             const input = document.getElementById('$id');
             
-            // Инициализация пикера
+          
             const picker = new tempusDominus.TempusDominus(input, $options);
             
-            // Обработка изменения даты
+           
             picker.subscribe(tempusDominus.Namespace.events.change, (event) => {
                 if (event.date) {
                     const formattedDate = picker.dates.formatInput(event.date);
