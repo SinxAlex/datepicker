@@ -1,6 +1,6 @@
 # Test widget DatePicker  Yii2
 
-[!input Yii2](https://www.yiiframework.com/doc/api/2.0/yii-widgets-inputwidget)
+[![Yii2](https://img.shields.io/badge/Yii-2.0.x-blue?logo=yii&style=flat-square)](https://www.yiiframework.com/)
 ## Example use :
 ```php
    <?php
