@@ -1,0 +1,19 @@
+{
+  "name": "vendor_name/datepicker",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Alex",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+  },
+  "autoload": {
+    "psr-4": {
+      "sinxalex\\datepicker\\": "src/"
+    }
+  }
+}
