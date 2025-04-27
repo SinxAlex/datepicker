@@ -14,7 +14,7 @@ composer require sinxalex/datepicker
     echo \sinxalex\datepicker\DatePicker::widget([
         'name' => 'Test',
         'value' => '',
-        'format' => 'd.m.Y', // явно указываем нужный формат
+        'format' => 'd.m.Y',
         'clientOptions' => [
             'button'=>true,
             'class'=>'btn btn-secondary',
