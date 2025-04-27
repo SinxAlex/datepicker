@@ -51,6 +51,9 @@ class DatePicker extends \yii\widgets\InputWidget
             $this->format = 'd.m.Y';
         }
 
+        if (!isset($this->options['id'])) {
+            $this->options['id'] = $this->getId();
+        }
         Html::addCssClass($this->options, 'form-control');
 
         $this->clientOptions = ArrayHelper::merge([
@@ -70,11 +73,19 @@ class DatePicker extends \yii\widgets\InputWidget
 
     protected function renderInput()
     {
+        Html::addCssClass($this->options, 'form-control');
 
-       Html::addCssClass($this->options, 'form-control');
-       $input = $this->hasModel() ? Html::activeTextInput($this->model, $this->attribute, $this->options) : Html::textInput($this->name, $this->value, $this->options);
-       Html::addCssClass($this->contentOptions, 'input-group');
-       return Html::tag('div', $input.'<button class="btn btn-secondary">'.self::ICON_WIDGET.'</button>',$this->contentOptions);
+        // Убедитесь, что значение правильно форматируется
+        if ($this->hasModel() && $this->model->{$this->attribute}) {
+            $this->value = Yii::$app->formatter->asDate($this->model->{$this->attribute}, $this->format);
+        }
+
+        $input = $this->hasModel()
+            ? Html::activeTextInput($this->model, $this->attribute, $this->options)
+            : Html::textInput($this->name, $this->value, $this->options);
+
+        Html::addCssClass($this->contentOptions, 'input-group');
+        return Html::tag('div', $input.'<button class="btn btn-secondary">'.self::ICON_WIDGET.'</button>',$this->contentOptions);
     }
 
         protected function registerAssets()
@@ -88,34 +99,30 @@ class DatePicker extends \yii\widgets\InputWidget
         $jsFormat = $this->getJsDateFormat();
 
         $js = <<<JS
-    (function() {
-        const tempusDominus = window.tempusDominus;
-        const input = document.getElementById('$id');
-        
-        // Инициализация пикера
-        const picker = new tempusDominus.TempusDominus(input, $options);
-        
-        // Функция для форматирования даты в нужный формат
-        function formatDate(date, format) {
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const year = date.getFullYear();
-            
-            return format
-                .replace('d', day)
-                .replace('m', month)
-                .replace('Y', year)
-                .replace('y', year.toString().slice(-2));
-        }
-        
-        // Обработка изменения даты
-        picker.subscribe(tempusDominus.Namespace.events.change, (event) => {
-            if (event.date) {
-                input.value = formatDate(event.date, '$phpFormat');
-            }
-        });
-    })();
-    JS;
+            (function() {
+                const tempusDominus = window.tempusDominus;
+                const input = document.getElementById('$id');
+                
+                // Инициализация пикера
+                const picker = new tempusDominus.TempusDominus(input, $options);
+                
+                // Обработка изменения даты
+                picker.subscribe(tempusDominus.Namespace.events.change, (event) => {
+                    if (event.date) {
+                        const formattedDate = picker.dates.formatInput(event.date);
+                        input.value = formattedDate;
+                        // Триггерим событие change для обновления модели Yii
+                        const changeEvent = new Event('change', { bubbles: true });
+                        input.dispatchEvent(changeEvent);
+                    }
+                });
+                
+                // Инициализация текущего значения, если оно есть
+                if (input.value) {
+                    picker.dates.set(tempusDominus.DateTime.convert(input.value));
+                }
+            })();
+            JS;
 
         $view->registerJs($js);
     }
@@ -140,7 +147,15 @@ class DatePicker extends \yii\widgets\InputWidget
     }
     protected function getJsDateFormat()
     {
-        return 'dd.MM.yyyy'; // Фиксированный формат, совместимый с Tempus Dominus
+
+        $formatMap = [
+            'd' => 'dd',
+            'm' => 'MM',
+            'Y' => 'yyyy',
+            'y' => 'yy',
+        ];
+
+        return strtr($this->format, $formatMap);
     }
 
     protected function getLocale()
