@@ -49,7 +49,7 @@ class DatePicker extends \yii\widgets\InputWidget
 
         if ($this->format === null) {
             $this->format = 'd.m.Y';
-        }
+        }йй
 
         if (!isset($this->options['id'])) {
             $this->options['id'] = $this->getId();
