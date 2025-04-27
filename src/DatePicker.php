@@ -84,6 +84,7 @@ class DatePicker extends \yii\widgets\InputWidget
 
         $id = $this->options['id'];
         $options = $this->getClientOptions();
+        $phpFormat = $this->format;
         $jsFormat = $this->getJsDateFormat();
 
         $js = <<<JS
@@ -94,16 +95,23 @@ class DatePicker extends \yii\widgets\InputWidget
         // Инициализация пикера
         const picker = new tempusDominus.TempusDominus(input, $options);
         
+        // Функция для форматирования даты в нужный формат
+        function formatDate(date, format) {
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            
+            return format
+                .replace('d', day)
+                .replace('m', month)
+                .replace('Y', year)
+                .replace('y', year.toString().slice(-2));
+        }
+        
         // Обработка изменения даты
         picker.subscribe(tempusDominus.Namespace.events.change, (event) => {
             if (event.date) {
-                // Используем встроенное форматирование через локализацию
-                const formatter = new Intl.DateTimeFormat('{$this->getLocale()}', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                });
-                input.value = formatter.format(event.date);
+                input.value = formatDate(event.date, '$phpFormat');
             }
         });
     })();
@@ -114,6 +122,7 @@ class DatePicker extends \yii\widgets\InputWidget
 
     protected function getClientOptions()
     {
+
         return Json::encode([
             'localization' => [
                 'locale' => Yii::$app->language,
