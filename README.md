@@ -1,5 +1,7 @@
 # Test widget DatePicker  Yii2
-## Example use 
+
+[input Yii2](https://www.yiiframework.com/doc/api/2.0/yii-widgets-inputwidget)
+## Example use :
 ```php
    <?php
     echo \sinxalex\datepicker\DatePicker::widget([
