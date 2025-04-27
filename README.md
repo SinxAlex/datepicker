@@ -1,7 +1,13 @@
 # Test widget DatePicker  Yii2
 
 [![Yii2](https://img.shields.io/badge/Yii-2.0.x-blue?logo=yii&style=flat-square)](https://www.yiiframework.com/)
-## Example use :
+
+
+### Install :
+composer require sinxalex/datepicker
+
+
+### Example use :
 ```php
    <?php
     echo \sinxalex\datepicker\DatePicker::widget([
