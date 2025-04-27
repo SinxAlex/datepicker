@@ -18,7 +18,6 @@ composer require sinxalex/datepicker
         'clientOptions' => [
             'button'=>true,
             'class'=>'btn btn-secondary',
-            'position'=>'left',
         ]
     ]);
 ?>
