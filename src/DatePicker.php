@@ -75,10 +75,10 @@ class DatePicker extends \yii\widgets\InputWidget
     {
         Html::addCssClass($this->options, 'form-control');
 
-        // Убедитесь, что значение правильно форматируется
+
         if ($this->hasModel() && $this->model->{$this->attribute}) {
             $this->value = Yii::$app->formatter->asDate($this->model->{$this->attribute}, $this->format);
-            $this->options['value'] = $this->value; // Явно устанавливаем значение
+            $this->options['value'] = $this->value;
         }
 
         $input = $this->hasModel()
@@ -110,18 +110,15 @@ class DatePicker extends \yii\widgets\InputWidget
                 if (event.date) {
                     const formattedDate = picker.dates.formatInput(event.date);
                     input.value = formattedDate;
-                    // Явно обновляем атрибут value
                     input.setAttribute('value', formattedDate);
-                    // Триггерим событие change для обновления модели Yii
                     const changeEvent = new Event('change', { bubbles: true });
                     input.dispatchEvent(changeEvent);
                 }
             });
             
-            // Инициализация текущего значения, если оно есть
             if (input.value) {
                 picker.dates.set(tempusDominus.DateTime.convert(input.value));
-                // Явно обновляем атрибут value при инициализации
+           
                 input.setAttribute('value', input.value);
             }
         })();
